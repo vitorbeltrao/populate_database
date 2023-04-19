@@ -1,0 +1,23 @@
+# creation of database enviroment
+version: "3.8" # compose file versions
+services: # services that compose will manager
+  db: # the first one is a database
+    image: postgres # image picked in docker hub
+    container_name: "pg_container"
+    environment: # environment variables
+      - POSTGRES_USER=sanya
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=sanya_db
+    ports: # postgres uses a specific port that is 5432
+      - "5432:5432"
+    volumes: # we need a folder to mantain the information. We need a specific volume in our machine to specific local in our container
+      - "./db:/var/lib/postgresql/data/" # my local folder "db" will be maped in postgres
+
+# to run this, you have to be with "docker desktop" opened
+# to run:
+
+# to kill the network you will use "docker-compose down"
+# to run again and create from scratch use "docker-compose up db" or "docker-compose up -d db"
+# to have the control of your container use "docker-compose ps"
+
+# obs: you cant write environment variables with blank spaces, or you gonna have error: "pg_container exited with code 1"
