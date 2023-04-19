@@ -45,7 +45,7 @@ def collect_raw_json_data(file_path: str) -> pd.DataFrame:
     '''Load dataset as a pandas dataframe for the json found at the path
 
     :param file_path: (str)
-    A path to the csv
+    A path to the json
 
     :return: (dataframe)
     Pandas dataframe
