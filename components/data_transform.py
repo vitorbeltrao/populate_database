@@ -72,7 +72,7 @@ def transform_json_data(
 
 def transform_string_to_float(
         raw_df: pd.DataFrame,
-        list_of_columns: list) -> None:
+        list_of_columns: list) -> pd.DataFrame:
     '''Function that transforms inputs from variables to floats, because many inputs that
     were supposed to be numbers contain a lot of dirt and then we clean this data
 
@@ -81,6 +81,9 @@ def transform_string_to_float(
 
     :param list_of_columns: (list)
     List of columns we want to convert from string to float
+
+    :return: (dataframe)
+    Pandas dataframe with the transformations performed
     '''
     df_transformed = raw_df.copy()
 
@@ -96,6 +99,7 @@ def transform_string_to_float(
             logging.info(f'The {col} has been successfully transformed\n')
         logging.info(
             f'Chosen {columns} entries were transformed from string to float: SUCCESS')
+        return df_transformed
 
     except ValueError:
         logging.info(
@@ -104,7 +108,7 @@ def transform_string_to_float(
 
 def transform_string_to_datetime(
         raw_df: pd.DataFrame,
-        column_name: str) -> None:
+        column_name: str) -> pd.DataFrame:
     '''Function that transforms variables that are as strings to datetime
 
     :param raw_df: (dataframe)
@@ -112,6 +116,9 @@ def transform_string_to_datetime(
 
     :param column_name: (str)
     Column name you want to transform
+
+    :return: (dataframe)
+    Pandas dataframe with the transformations performed
     '''
     df_transformed = raw_df.copy()
 
@@ -120,6 +127,7 @@ def transform_string_to_datetime(
         df_transformed[column_name] = pd.to_datetime(
             df_transformed.column_name, format='%b %d, %Y')
         logging.info(f'The {column_name} was transformed to datetime: SUCCESS')
+        return df_transformed
 
     except ValueError:
         logging.info('Time data doesnt match format: FAILED')
