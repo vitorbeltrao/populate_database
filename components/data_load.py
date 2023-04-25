@@ -13,6 +13,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 from decouple import config
 
+from data_collector import collect_raw_json_data
+from data_transform import transform_json_data
+
 logging.basicConfig(
     level=logging.INFO,
     filemode='w',
@@ -23,13 +26,10 @@ DB_NAME = config('DB_NAME')
 USER = config('USER')
 PASSWORD = config('PASSWORD')
 SCHEMAS_TO_CREATE = config('SCHEMAS_TO_CREATE').split(',')
+OPEN_POSITIONS_RAW_PATH = config('OPEN_POSITIONS_RAW_PATH')
 
 
-# template of connection to your postgres database
-# engine = create_engine('postgresql+psycopg2://user:password@hostname/database_name')
-
-
-def create_schema(
+def create_schema_into_postgresql(
         db_name: str, 
         user_name: str, 
         password: str, 
@@ -77,7 +77,7 @@ def create_schema(
     conn.close()
 
 
-def create_table(
+def create_table_into_postgresql(
         db_name: str,
         user_name: str, 
         password: str, 
@@ -136,11 +136,95 @@ def create_table(
     conn.close()
 
 
+def insert_data_into_postgresql(
+    datab_name: str,
+    user_name: str, 
+    password: str, 
+    schema_name: str, 
+    table_name: str, 
+    df: pd.DataFrame) -> None:
+    '''
+    Function that inserts data from a Pandas DataFrame into a PostgreSQL table.
+    If the table does not exist, it creates a new one in the specified schema.
+
+    :param datab_name: (str)
+    The name of the database to connect to.
+
+    :param user_name: (str)
+    The name of the user to authenticate as.
+
+    :param password: (str) 
+    The user's password.
+
+    :param schema_name: (str)
+    The name of the schema where the table should be created.
+
+    :param table_name: (str)
+    The name of the table to be created or where the data will be inserted.
+
+    :param df: (pandas.DataFrame)
+    The DataFrame containing the data to be inserted.
+    '''
+
+    # Connect to the PostgreSQL database
+    db_host = 'localhost'
+    db_port = '5432'
+    db_name = datab_name
+    db_user = user_name
+    db_pass = password
+
+    conn = psycopg2.connect(
+        host=db_host,
+        port=db_port,
+        dbname=db_name,
+        user=db_user,
+        password=db_pass
+    )
+    # create engine
+    engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}')
+
+    # Create a temporary table with the data from the DataFrame
+    temp_table_name = f'temp_{table_name}'
+    df.to_sql(name=temp_table_name, con=engine.connect(), schema=schema_name, index=False, if_exists='replace')
+    logging.info('Temporary table was created: SUCCESS')
+
+    # Check if the final table exists
+    table_exists = engine.has_table(table_name=table_name, schema=schema_name)
+
+    if table_exists:
+        # Check if the DataFrame columns match the table columns
+        db_cols_query = f"SELECT column_name FROM information_schema.columns WHERE table_name='{table_name}' AND table_schema='{schema_name}'"
+        with conn.cursor() as cur:
+            cur.execute(db_cols_query)
+            db_columns = [col[0] for col in cur.fetchall()]
+
+        df_columns = df.columns.tolist()
+
+        if db_columns != df_columns:
+            raise ValueError(f'The columns of the DataFrame do not match the columns of the table {schema_name}.{table_name}')
+
+        # Insert the data into the final table without overwriting existing data
+        insert_query = f'INSERT INTO {schema_name}.{table_name} SELECT * FROM {schema_name}.{temp_table_name} ON CONFLICT DO NOTHING;'
+        with conn.cursor() as cur:
+            cur.execute(insert_query)
+        logging.info('The dataframe data has been inserted: SUCCESS')
+
+    # Remove the temporary table
+    drop_query = f'DROP TABLE {schema_name}.{temp_table_name};'
+    with conn.cursor() as cur:
+        cur.execute(drop_query)
+    logging.info('The temp table has been removed: SUCCESS')
+
+    # Close the database connection
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     # 1. create the schema if it does not already exist
     logging.info('About to start executing the create schema function')
     for schema in SCHEMAS_TO_CREATE:
-        create_schema(DB_NAME, USER, PASSWORD, schema)
+        create_schema_into_postgresql(DB_NAME, USER, PASSWORD, schema)
     logging.info('Done executing the create schema function\n')
 
     # 2. create tables
@@ -167,7 +251,7 @@ if __name__ == "__main__":
     management INT,
     operations INT
     '''
-    create_table(DB_NAME, USER, PASSWORD, 'startups_hiring', 'open_positions', table_columns)
+    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'startups_hiring', 'open_positions', table_columns)
     logging.info('Done executing the create table "open_positions" function\n')
 
     # 2.2 create first table in "nba" schema
@@ -178,7 +262,7 @@ if __name__ == "__main__":
     season_start_year INT,
     inflation_adj_payroll FLOAT
     '''
-    create_table(DB_NAME, USER, PASSWORD, 'nba', 'nba_payroll', table_columns)
+    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'nba_payroll', table_columns)
     logging.info('Done executing the create table "nba_payroll" function\n')
 
     # 2.2 create second table in "nba" schema
@@ -214,7 +298,7 @@ if __name__ == "__main__":
     plus_minus FLOAT,
     video_available INT
     '''
-    create_table(DB_NAME, USER, PASSWORD, 'nba', 'player_box_score_stats', table_columns)
+    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'player_box_score_stats', table_columns)
     logging.info('Done executing the create table "player_box_score_stats" function\n')
 
     # 2.3 create third table in "nba" schema
@@ -252,7 +336,7 @@ if __name__ == "__main__":
     pf FLOAT,
     minus FLOAT
     '''
-    create_table(DB_NAME, USER, PASSWORD, 'nba', 'player_stats', table_columns)
+    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'player_stats', table_columns)
     logging.info('Done executing the create table "player_stats" function\n')
 
     # 2.4 create fourth table in "nba" schema
@@ -265,5 +349,24 @@ if __name__ == "__main__":
     salary FLOAT,
     inflation_adj_salary FLOAT
     '''
-    create_table(DB_NAME, USER, PASSWORD, 'nba', 'nba_salaries', table_columns)
+    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'nba_salaries', table_columns)
     logging.info('Done executing the create table "nba_salaries" function\n')
+
+    # 3. insert transformed dataframes into postgres
+    # 3.1 insert data into open_positions table
+    logging.info('About to start inserting the data into open_positions table')
+
+    # extracting data
+    open_positions_raw_df = collect_raw_json_data(OPEN_POSITIONS_RAW_PATH)
+
+    # transforming data
+    list_of_columns = ['tags', 'locations', 'industries']
+    open_positions_transformed_df = transform_json_data(
+        open_positions_raw_df, 'logo_url', list_of_columns, 'jobs')
+    
+    # loading data
+    insert_data_into_postgresql(
+        DB_NAME, USER, PASSWORD, 'startups_hiring', 'open_positions', open_positions_transformed_df)
+    logging.info('Done executing inserting the data into open_positions table\n')
+
+    # 3.2 insert data into ... table
