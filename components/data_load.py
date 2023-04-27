@@ -218,3 +218,40 @@ def insert_data_into_postgresql(
     # Close the database connection
     conn.commit()
     conn.close()
+
+
+def add_auto_increment_id_to_table(
+        db_name: str, user_name: str, password: str, schema_table: str) -> None:
+    '''Connects to a PostgreSQL database and adds an 
+    auto-incrementing id column to a specified table
+
+    :param db_name: (str)
+    The name of the database to connect to
+
+    :param user_name: (str)
+    The name of the user to authenticate as
+
+    :param password: (str)
+    The user's password
+
+    :param schema_table: (str)
+    The name of the schema and table in database.
+    Example: 'nba.nba_payroll'
+    '''
+    # Connect to the database
+    conn = psycopg2.connect(
+        host="localhost",
+        database=db_name,
+        user=user_name,
+        password=password
+    )
+
+    # Add a new column with an auto-incrementing id
+    cur = conn.cursor()
+    cur.execute(f'ALTER TABLE {schema_table} ADD COLUMN id SERIAL PRIMARY KEY;')
+    conn.commit()
+    logging.info(f'The ids in the {schema_table} were created: SUCCESS')
+
+    # Close the database connection
+    cur.close()
+    conn.close()

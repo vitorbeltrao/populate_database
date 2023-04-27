@@ -1,5 +1,5 @@
 '''
-Main file that will run all the components in order to 
+Main file that will run all the components in order to
 insert the data from the tables in the database
 
 Author: Vitor Abdo
@@ -23,6 +23,7 @@ from components.data_transform import transform_string_to_datetime
 from components.data_load import create_schema_into_postgresql
 from components.data_load import create_table_into_postgresql
 from components.data_load import insert_data_into_postgresql
+from components.data_load import add_auto_increment_id_to_table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -50,7 +51,8 @@ if __name__ == "__main__":
 
     # 2. create tables
     # 2.1 create first table in "startups_hiring" schema
-    logging.info('About to start executing the create table "open_positions" function')
+    logging.info(
+        'About to start executing the create table "open_positions" function')
     table_columns = '''
     company_name VARCHAR(50),
     headline TEXT,
@@ -71,22 +73,36 @@ if __name__ == "__main__":
     management INT,
     operations INT
     '''
-    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'startups_hiring', 'open_positions', table_columns)
+    create_table_into_postgresql(
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'startups_hiring',
+        'open_positions',
+        table_columns)
     logging.info('Done executing the create table "open_positions" function\n')
 
     # 2.2 create first table in "nba" schema
-    logging.info('About to start executing the create table "nba_payroll" function')
+    logging.info(
+        'About to start executing the create table "nba_payroll" function')
     table_columns = '''
     team VARCHAR(30),
     season_start_year INT,
     payroll FLOAT,
     inflation_adj_payroll FLOAT
     '''
-    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'nba_payroll', table_columns)
+    create_table_into_postgresql(
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'nba_payroll',
+        table_columns)
     logging.info('Done executing the create table "nba_payroll" function\n')
 
     # 2.2 create second table in "nba" schema
-    logging.info('About to start executing the create table "player_box_score_stats" function')
+    logging.info(
+        'About to start executing the create table "player_box_score_stats" function')
     table_columns = '''
     season INT,
     game_id INT,
@@ -117,11 +133,19 @@ if __name__ == "__main__":
     plus_minus FLOAT,
     video_available INT
     '''
-    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'player_box_score_stats', table_columns)
-    logging.info('Done executing the create table "player_box_score_stats" function\n')
+    create_table_into_postgresql(
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'player_box_score_stats',
+        table_columns)
+    logging.info(
+        'Done executing the create table "player_box_score_stats" function\n')
 
     # 2.3 create third table in "nba" schema
-    logging.info('About to start executing the create table "player_stats" function')
+    logging.info(
+        'About to start executing the create table "player_stats" function')
     table_columns = '''
     season INT,
     player_name VARCHAR(30),
@@ -154,22 +178,35 @@ if __name__ == "__main__":
     pf FLOAT,
     pts FLOAT
     '''
-    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'player_stats', table_columns)
+    create_table_into_postgresql(
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'player_stats',
+        table_columns)
     logging.info('Done executing the create table "player_stats" function\n')
 
     # 2.4 create fourth table in "nba" schema
-    logging.info('About to start executing the create table "nba_salaries" function')
+    logging.info(
+        'About to start executing the create table "nba_salaries" function')
     table_columns = '''
     player_name VARCHAR(30),
     season_start_year INT,
     salary FLOAT,
     inflation_adj_salary FLOAT
     '''
-    create_table_into_postgresql(DB_NAME, USER, PASSWORD, 'nba', 'nba_salaries', table_columns)
+    create_table_into_postgresql(
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'nba_salaries',
+        table_columns)
     logging.info('Done executing the create table "nba_salaries" function\n')
 
     # 3. insert transformed dataframes into postgres
-    ### 3.1 insert data into open_positions table
+    # 3.1 insert data into open_positions table
     logging.info('About to start inserting the data into open_positions table')
 
     # extracting data
@@ -180,18 +217,24 @@ if __name__ == "__main__":
     columns_to_convert_to_str = ['tags', 'locations', 'industries']
     open_positions_transformed_df = transform_json_data(
         open_positions_raw_df, columns_to_drop, columns_to_convert_to_str, 'jobs')
-    
+
     open_positions_transformed_df = open_positions_transformed_df.rename(
-        columns=lambda x: x.strip().lower().replace(' ', '_')) # standardize column names
-    
+        columns=lambda x: x.strip().lower().replace(' ', '_'))  # standardize column names
+
     open_positions_transformed_df.drop_duplicates(inplace=True)
 
     # loading data
     insert_data_into_postgresql(
-        DB_NAME, USER, PASSWORD, 'startups_hiring', 'open_positions', open_positions_transformed_df)
-    logging.info('Done executing inserting the data into open_positions table\n')
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'startups_hiring',
+        'open_positions',
+        open_positions_transformed_df)
+    logging.info(
+        'Done executing inserting the data into open_positions table\n')
 
-    ### 3.2 insert data into nba_payroll table
+    # 3.2 insert data into nba_payroll table
     logging.info('About to start inserting the data into nba_payroll table')
 
     # extracting data
@@ -201,25 +244,36 @@ if __name__ == "__main__":
     columns_to_convert_to_float = ['payroll', 'inflationAdjPayroll']
     nba_payroll_transformed_df = transform_string_to_float(
         nba_payroll_raw_df, columns_to_convert_to_float)
-    
-    nba_payroll_transformed_df.drop(['Unnamed: 0'], axis=1, inplace=True) # drop unnecessary columns
+
+    nba_payroll_transformed_df.drop(
+        ['Unnamed: 0'],
+        axis=1,
+        inplace=True)  # drop unnecessary columns
 
     nba_payroll_transformed_df = nba_payroll_transformed_df.rename(
-        columns=lambda x: x.strip().lower().replace(' ', '_')) # standardize column names
+        columns=lambda x: x.strip().lower().replace(
+            ' ', '_'))  # standardize column names
     nba_payroll_transformed_df.rename(
         columns={
-        'seasonstartyear': 'season_start_year', 
-        'inflationadjpayroll': 'inflation_adj_payroll'}, inplace=True) # standardize column names
-    
+            'seasonstartyear': 'season_start_year',
+            'inflationadjpayroll': 'inflation_adj_payroll'},
+        inplace=True)  # standardize column names
+
     nba_payroll_transformed_df.drop_duplicates(inplace=True)
 
     # loading data
     insert_data_into_postgresql(
-        DB_NAME, USER, PASSWORD, 'nba', 'nba_payroll', nba_payroll_transformed_df)
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'nba_payroll',
+        nba_payroll_transformed_df)
     logging.info('Done executing inserting the data into nba_payroll table\n')
 
-    ### 3.3 insert data into player_box_score_stats table
-    logging.info('About to start inserting the data into player_box_score_stats table')
+    # 3.3 insert data into player_box_score_stats table
+    logging.info(
+        'About to start inserting the data into player_box_score_stats table')
 
     # extracting data
     nba_player_box_raw_df = collect_raw_csv_data(NBA_PLAYER_BOX_RAW_PATH)
@@ -228,20 +282,27 @@ if __name__ == "__main__":
     column_to_convert_to_date = 'GAME_DATE'
     nba_player_box_transformed_df = transform_string_to_datetime(
         nba_player_box_raw_df, column_to_convert_to_date)
-    
-    nba_player_box_transformed_df.drop(['Unnamed: 0'], axis=1, inplace=True) # drop unnecessary columns
+
+    nba_player_box_transformed_df.drop(
+        ['Unnamed: 0'], axis=1, inplace=True)  # drop unnecessary columns
 
     nba_player_box_transformed_df = nba_player_box_transformed_df.rename(
-        columns=lambda x: x.strip().lower().replace(' ', '_')) # standardize column names
+        columns=lambda x: x.strip().lower().replace(' ', '_'))  # standardize column names
 
     nba_player_box_transformed_df.drop_duplicates(inplace=True)
 
     # loading data
     insert_data_into_postgresql(
-        DB_NAME, USER, PASSWORD, 'nba', 'player_box_score_stats', nba_player_box_transformed_df)
-    logging.info('Done executing inserting the data into player_box_score_stats table\n')
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'player_box_score_stats',
+        nba_player_box_transformed_df)
+    logging.info(
+        'Done executing inserting the data into player_box_score_stats table\n')
 
-    ### 3.4 insert data into player_stats table
+    # 3.4 insert data into player_stats table
     logging.info('About to start inserting the data into player_stats table')
 
     # extracting data
@@ -249,31 +310,36 @@ if __name__ == "__main__":
 
     # transforming data
     nba_player_stats_transformed_df = nba_player_stats_raw_df.drop(
-        ['Unnamed: 0.1', 'Unnamed: 0'], axis=1) # drop unnecessary columns
+        ['Unnamed: 0.1', 'Unnamed: 0'], axis=1)  # drop unnecessary columns
 
     nba_player_stats_transformed_df = nba_player_stats_transformed_df.rename(
-        columns=lambda x: x.strip().lower().replace(' ', '_')) # standardize column names
+        columns=lambda x: x.strip().lower().replace(' ', '_'))  # standardize column names
     nba_player_stats_transformed_df.rename(
         columns={
-        'player': 'player_name', 
-        'fg%': 'fg_percent',
-        '3p': 'threep',
-        '3pa': 'threepa',
-        '3p%': 'threep_percent',
-        '2p': 'twop',
-        '2pa': 'twopa',
-        '2p%': 'twop_percent',
-        'efg%': 'efg_percent',
-        'ft%': 'ft_percent'}, inplace=True) # standardize column names
-    
+            'player': 'player_name',
+            'fg%': 'fg_percent',
+            '3p': 'threep',
+            '3pa': 'threepa',
+            '3p%': 'threep_percent',
+            '2p': 'twop',
+            '2pa': 'twopa',
+            '2p%': 'twop_percent',
+            'efg%': 'efg_percent',
+            'ft%': 'ft_percent'}, inplace=True)  # standardize column names
+
     nba_player_stats_transformed_df.drop_duplicates(inplace=True)
 
     # loading data
     insert_data_into_postgresql(
-        DB_NAME, USER, PASSWORD, 'nba', 'player_stats', nba_player_stats_transformed_df)
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'player_stats',
+        nba_player_stats_transformed_df)
     logging.info('Done executing inserting the data into player_stats table\n')
 
-    ### 3.5 insert data into nba_salaries table
+    # 3.5 insert data into nba_salaries table
     logging.info('About to start inserting the data into nba_salaries table')
 
     # extracting data
@@ -283,20 +349,43 @@ if __name__ == "__main__":
     columns_to_convert_to_float = ['salary', 'inflationAdjSalary']
     nba_salaries_transformed_df = transform_string_to_float(
         nba_salaries_raw_df, columns_to_convert_to_float)
-    
-    nba_salaries_transformed_df.drop(['Unnamed: 0'], axis=1, inplace=True) # drop unnecessary columns
+
+    nba_salaries_transformed_df.drop(
+        ['Unnamed: 0'],
+        axis=1,
+        inplace=True)  # drop unnecessary columns
 
     nba_salaries_transformed_df = nba_salaries_transformed_df.rename(
-        columns=lambda x: x.strip().lower().replace(' ', '_')) # standardize column names
+        columns=lambda x: x.strip().lower().replace(
+            ' ', '_'))  # standardize column names
     nba_salaries_transformed_df.rename(
         columns={
-        'playername': 'player_name', 
-        'seasonstartyear': 'season_start_year',
-        'inflationadjsalary': 'inflation_adj_salary'}, inplace=True) # standardize column names
-    
+            'playername': 'player_name',
+            'seasonstartyear': 'season_start_year',
+            'inflationadjsalary': 'inflation_adj_salary'},
+        inplace=True)  # standardize column names
+
     nba_salaries_transformed_df.drop_duplicates(inplace=True)
 
     # loading data
     insert_data_into_postgresql(
-        DB_NAME, USER, PASSWORD, 'nba', 'nba_salaries', nba_salaries_transformed_df)
+        DB_NAME,
+        USER,
+        PASSWORD,
+        'nba',
+        'nba_salaries',
+        nba_salaries_transformed_df)
     logging.info('Done executing inserting the data into nba_salaries table\n')
+
+    # 4. Create unique id's incrementally in tables already inserted in
+    # postgres
+    logging.info('About to start to create unique ids for the tables')
+    schema_tables = [
+        'startups_hiring.open_positions',
+        'nba.nba_payroll',
+        'nba.player_box_score_stats',
+        'nba.player_stats',
+        'nba.nba_salaries']
+    for i in schema_tables:
+        add_auto_increment_id_to_table(DB_NAME, USER, PASSWORD, i)
+    logging.info('Done executing the creation of unique ids')
