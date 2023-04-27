@@ -9,16 +9,11 @@ Date: April/2023
 # import necessary packages
 import logging
 import pandas as pd
-from decouple import config
 
 logging.basicConfig(
     level=logging.INFO,
     filemode='w',
     format='%(name)s - %(levelname)s - %(message)s')
-
-# config
-CSV_PATH = config('CSV_PATH')
-JSON_PATH = config('JSON_PATH')
 
 
 def collect_raw_csv_data(file_path: str) -> pd.DataFrame:
