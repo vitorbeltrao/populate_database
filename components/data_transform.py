@@ -18,7 +18,7 @@ logging.basicConfig(
 
 def transform_json_data(
         raw_df: pd.DataFrame,
-        columns_to_drop: str,
+        columns_to_drop: list,
         list_of_columns: list,
         columns_to_json_normalize: str) -> pd.DataFrame:
     '''Make the necessary transformations on the dataframe that is in json format
@@ -31,8 +31,8 @@ def transform_json_data(
     :param raw_df: (dataframe)
     Pandas dataframe that we want to perform the transformations
 
-    :param columns_to_drop: (str)
-    Name of the columns we want to delete from the dataframe
+    :param columns_to_drop: (list)
+    List columns we want to delete from the dataframe
 
     :param list_of_columns: (list)
     List of columns we want to convert from list to string
@@ -46,7 +46,7 @@ def transform_json_data(
     df_transformed = raw_df.copy()
 
     # 1. drop columns that don't have data
-    df_transformed.drop(columns=[columns_to_drop], axis=1, inplace=True)
+    df_transformed.drop(columns=columns_to_drop, axis=1, inplace=True)
     logging.info(f'Columns: {columns_to_drop} have been removed: SUCCESS')
 
     # 2. remove the lists inside the dataframe
@@ -125,7 +125,7 @@ def transform_string_to_datetime(
     # 1. convert the variables in datetime object
     try:
         df_transformed[column_name] = pd.to_datetime(
-            df_transformed.column_name, format='%b %d, %Y')
+            df_transformed[column_name], format='%b %d, %Y')
         logging.info(f'The {column_name} was transformed to datetime: SUCCESS')
         return df_transformed
 
