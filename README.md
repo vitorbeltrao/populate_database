@@ -1,4 +1,4 @@
-# Populate Database
+# Populate PostgreSQL Database
 
 ## Table of Contents
 
