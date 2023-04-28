@@ -5,9 +5,9 @@ services: # services that compose will manager
     image: postgres # image picked in docker hub
     container_name: "pg_container"
     environment: # environment variables
-      - POSTGRES_USER=sanya
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=sanya_db
+      - POSTGRES_USER=${USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     ports: # postgres uses a specific port that is 5432
       - "5432:5432"
     volumes: # we need a folder to mantain the information. We need a specific volume in our machine to specific local in our container
