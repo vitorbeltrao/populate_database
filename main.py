@@ -24,6 +24,7 @@ from components.data_load import create_schema_into_postgresql
 from components.data_load import create_table_into_postgresql
 from components.data_load import insert_data_into_postgresql
 from components.data_load import add_auto_increment_id_to_table
+from components.data_load import add_monitoring_columns_to_table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -377,9 +378,10 @@ if __name__ == "__main__":
         nba_salaries_transformed_df)
     logging.info('Done executing inserting the data into nba_salaries table\n')
 
-    # 4. Create unique id's incrementally in tables already inserted in
-    # postgres
-    logging.info('About to start to create unique ids for the tables')
+    # 4. Create unique id's incrementally in tables already inserted in postgres
+    # 5. Create monitoring columns in tables already inserted in postgres 
+    logging.info(
+        'About to start to create unique ids and monitoring columns for the tables')
     schema_tables = [
         'startups_hiring.open_positions',
         'nba.nba_payroll',
@@ -388,4 +390,6 @@ if __name__ == "__main__":
         'nba.nba_salaries']
     for i in schema_tables:
         add_auto_increment_id_to_table(DB_NAME, USER, PASSWORD, i)
-    logging.info('Done executing the creation of unique ids')
+        add_monitoring_columns_to_table(DB_NAME, USER, PASSWORD, i)
+    logging.info(
+        'Done executing the creation of unique ids and monitoring columns')
