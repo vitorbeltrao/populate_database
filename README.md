@@ -18,11 +18,11 @@ This project aims to populate a PostgreSQL database with data from two distinct 
 
 The first source, referring to startups, only a .json file was obtained; The second source, about NBA teams and players, four .csv files were obtained. The data is collected, transformed, and loaded into the database using a modularized approach. 
 
-![Populate Database architecture](https://github.com/vitorbeltrao/risk_assessment/blob/main/Images/risk_assessment%20-%20architecture.jpg?raw=true)
+![Populate Database architecture](https://github.com/vitorbeltrao/populate_database/blob/main/images/populate_db_architecture.jpg?raw=true)
 
-In the end, a database was created that has two schemas (one for each data source) and within each schema we have all the necessary tables:
+In the end, a database was created that has two schemas (one for each data source) and within each schema we have all the necessary tables. See the entire database hierarchy:
 
-![Populate Database architecture](https://github.com/vitorbeltrao/risk_assessment/blob/main/Images/risk_assessment%20-%20architecture.jpg?raw=true)
+![Populate Database architecture](https://github.com/vitorbeltrao/populate_database/blob/main/images/database_hierarchy.png?raw=true)
 ***
 
 ## Files Description <a name="files"></a>
