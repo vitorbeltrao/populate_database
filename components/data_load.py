@@ -19,11 +19,15 @@ logging.basicConfig(
 
 
 def create_schema_into_postgresql(
+        host_name: str,
         db_name: str,
         user_name: str,
         password: str,
         schema_name: str) -> None:
     '''Connects to a PostgreSQL database and creates a schema if it does not already exist
+
+    :param host_name: (str)
+    Is the network name for the physical machine on which the node is installed
 
     :param db_name: (str)
     The name of the database to connect to
@@ -40,7 +44,7 @@ def create_schema_into_postgresql(
 
     # Set up the connection
     conn = psycopg2.connect(
-        host='localhost',
+        host=host_name,
         database=db_name,
         user=user_name,
         password=password
@@ -68,6 +72,8 @@ def create_schema_into_postgresql(
 
 
 def create_table_into_postgresql(
+        host_name: str,
+        port: str,
         db_name: str,
         user_name: str,
         password: str,
@@ -75,6 +81,12 @@ def create_table_into_postgresql(
         table_name: str,
         table_columns: str) -> None:
     '''Function that creates a table if it does not exist in a PostgresSQL schema
+
+    :param host_name: (str)
+    Is the network name for the physical machine on which the node is installed
+
+    :param port: (str)
+    Default port used for the protocol
 
     :param db_name: (str)
     The name of the database to connect to
@@ -96,11 +108,11 @@ def create_table_into_postgresql(
     '''
     # Connection to the PostgresSQL database
     conn = psycopg2.connect(
-        host='localhost',
+        host=host_name,
         database=db_name,
         user=user_name,
         password=password,
-        port='5432'
+        port=port
     )
 
     # Creation of a cursor to execute SQL commands
@@ -129,6 +141,8 @@ def create_table_into_postgresql(
 
 
 def insert_data_into_postgresql(
+        host_name: str,
+        port: str,
         datab_name: str,
         user_name: str,
         password: str,
@@ -138,6 +152,12 @@ def insert_data_into_postgresql(
     '''
     Function that inserts data from a Pandas DataFrame into a PostgreSQL table.
     If the table does not exist, it creates a new one in the specified schema.
+
+    :param host_name: (str)
+    Is the network name for the physical machine on which the node is installed
+
+    :param port: (str)
+    Default port used for the protocol
 
     :param datab_name: (str)
     The name of the database to connect to.
@@ -159,8 +179,8 @@ def insert_data_into_postgresql(
     '''
 
     # Connect to the PostgreSQL database
-    db_host = 'localhost'
-    db_port = '5432'
+    db_host = host_name
+    db_port = port
     db_name = datab_name
     db_user = user_name
     db_pass = password
@@ -221,9 +241,12 @@ def insert_data_into_postgresql(
 
 
 def add_auto_increment_id_to_table(
-        db_name: str, user_name: str, password: str, schema_table: str) -> None:
+        host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
     '''Connects to a PostgreSQL database and adds an 
     auto-incrementing id column to a specified table
+
+    :param host_name: (str)
+    Is the network name for the physical machine on which the node is installed
 
     :param db_name: (str)
     The name of the database to connect to
@@ -240,7 +263,7 @@ def add_auto_increment_id_to_table(
     '''
     # Connect to the database
     conn = psycopg2.connect(
-        host="localhost",
+        host=host_name,
         database=db_name,
         user=user_name,
         password=password
@@ -258,10 +281,13 @@ def add_auto_increment_id_to_table(
 
 
 def add_monitoring_columns_to_table(
-        db_name: str, user_name: str, password: str, schema_table: str) -> None:
+        host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
     '''Connects to a PostgreSQL database and adds two
     columns "created_at" and "updated_at" to monitore
     the flow of data
+
+    :param host_name: (str)
+    Is the network name for the physical machine on which the node is installed
 
     :param db_name: (str)
     The name of the database to connect to
@@ -278,7 +304,7 @@ def add_monitoring_columns_to_table(
     '''
     # Connect to the database
     conn = psycopg2.connect(
-        host="localhost",
+        host=host_name,
         database=db_name,
         user=user_name,
         password=password

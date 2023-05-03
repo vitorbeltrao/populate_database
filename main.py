@@ -32,6 +32,8 @@ logging.basicConfig(
     format='%(name)s - %(levelname)s - %(message)s')
 
 # config
+HOST_NAME = config('HOST_NAME')
+PORT = config('PORT')
 DB_NAME = config('DB_NAME')
 USER = config('USER')
 PASSWORD = config('PASSWORD')
@@ -47,7 +49,7 @@ if __name__ == "__main__":
     # 1. create the schema if it does not already exist
     logging.info('About to start executing the create schema function')
     for schema in SCHEMAS_TO_CREATE:
-        create_schema_into_postgresql(DB_NAME, USER, PASSWORD, schema)
+        create_schema_into_postgresql(HOST_NAME, DB_NAME, USER, PASSWORD, schema)
     logging.info('Done executing the create schema function\n')
 
     # 2. create tables
@@ -75,6 +77,8 @@ if __name__ == "__main__":
     operations INT
     '''
     create_table_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -93,6 +97,8 @@ if __name__ == "__main__":
     inflation_adj_payroll FLOAT
     '''
     create_table_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -135,6 +141,8 @@ if __name__ == "__main__":
     video_available INT
     '''
     create_table_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -180,6 +188,8 @@ if __name__ == "__main__":
     pts FLOAT
     '''
     create_table_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -198,6 +208,8 @@ if __name__ == "__main__":
     inflation_adj_salary FLOAT
     '''
     create_table_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -226,6 +238,8 @@ if __name__ == "__main__":
 
     # loading data
     insert_data_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -264,6 +278,8 @@ if __name__ == "__main__":
 
     # loading data
     insert_data_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -294,6 +310,8 @@ if __name__ == "__main__":
 
     # loading data
     insert_data_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -332,6 +350,8 @@ if __name__ == "__main__":
 
     # loading data
     insert_data_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -370,6 +390,8 @@ if __name__ == "__main__":
 
     # loading data
     insert_data_into_postgresql(
+        HOST_NAME,
+        PORT,
         DB_NAME,
         USER,
         PASSWORD,
@@ -389,7 +411,7 @@ if __name__ == "__main__":
         'nba.player_stats',
         'nba.nba_salaries']
     for i in schema_tables:
-        add_auto_increment_id_to_table(DB_NAME, USER, PASSWORD, i)
-        add_monitoring_columns_to_table(DB_NAME, USER, PASSWORD, i)
+        add_auto_increment_id_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
+        add_monitoring_columns_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
     logging.info(
         'Done executing the creation of unique ids and monitoring columns')
