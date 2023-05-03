@@ -66,6 +66,10 @@ To make everything work, you need to create the `.env` file in your main directo
 
 In the .env, you must define the following variables:
 
+* `HOST_NAME`: str (Name of your hostname)
+
+* `PORT`: str (Number of port used for the protocol)
+
 * `DB_NAME`: str (Name of your postgres database)
 
 * `USER`: str (Name of postgres user)
