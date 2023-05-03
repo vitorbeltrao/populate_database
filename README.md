@@ -16,6 +16,8 @@ This project aims to populate a PostgreSQL database with data from two distinct 
 * [Top Tech Startups Hiring 2023](https://www.kaggle.com/datasets/chickooo/top-tech-startups-hiring-2023?select=json_data.json)
 * [NBA Players & Team Data](https://www.kaggle.com/datasets/loganlauton/nba-players-and-team-data)
 
+This data from the above source was collected directly by the Kaggle API, where we created a function to get it, to see the code see the *data_collector.py* component and the *main.py file*. For more information on how to use the Kaggle API I recommend the [documentation](https://www.kaggle.com/docs/api) and this other [source](https://python.plainenglish.io/how-to-use-the-kaggle-api-in-python-4d4c812c39c7).
+
 The first source, referring to startups, only a .json file was obtained; The second source, about NBA teams and players, four .csv files were obtained. The data is collected, transformed, and loaded into the database using a modularized approach. 
 
 ![Populate Database architecture](https://github.com/vitorbeltrao/populate_database/blob/main/images/populate_db_architecture.jpg?raw=true)
@@ -33,7 +35,7 @@ In the end, a database was created that has two schemas (one for each data sourc
 
 * `components/`: Directory containing the modularized components for the project.
 
-    * `data_collector.py`: Python module for collecting the raw data from Kaggle.
+    * `data_collector.py`: Python module to collect raw data from Kaggle and read it as a pandas dataframe.
     * `data_transform.py`: Python module for transforming the raw data into a format that can be loaded into the PostgreSQL database.
     * `data_load.py`: Python module for loading the transformed data into the PostgreSQL database.
 
