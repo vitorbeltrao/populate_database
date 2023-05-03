@@ -11,8 +11,9 @@ import logging
 from decouple import config
 
 # data_collector component
-from components.data_collector import collect_raw_json_data
-from components.data_collector import collect_raw_csv_data
+from components.data_collector import collect_from_kaggle
+from components.data_collector import read_raw_json_data
+from components.data_collector import read_raw_csv_data
 
 # data_transform component
 from components.data_transform import transform_json_data
@@ -46,6 +47,23 @@ NBA_SALARIES_RAW_PATH = config('NBA_SALARIES_RAW_PATH')
 
 
 if __name__ == "__main__":
+    # 0. download the Kaggle API files
+    logging.info('About to start executing Kaggle files download')
+
+    # 0.1 download startup data
+    collect_from_kaggle(
+        'chickooo', 'top-tech-startups-hiring-2023', 'json_data.json', './data')
+    
+    # 0.2 download nba data
+    nba_datasets_list = [
+        'NBA Payroll(1990-2023).csv', 
+        'NBA Player Box Score Stats(1950 - 2022).csv', 
+        'NBA Player Stats(1950 - 2022).csv', 
+        'NBA Salaries(1990-2023).csv']
+    for nba_dataset in nba_datasets_list:
+        collect_from_kaggle(
+            'loganlauton', 'nba-players-and-team-data', nba_dataset, './data')
+
     # 1. create the schema if it does not already exist
     logging.info('About to start executing the create schema function')
     for schema in SCHEMAS_TO_CREATE:
@@ -223,7 +241,7 @@ if __name__ == "__main__":
     logging.info('About to start inserting the data into open_positions table')
 
     # extracting data
-    open_positions_raw_df = collect_raw_json_data(OPEN_POSITIONS_RAW_PATH)
+    open_positions_raw_df = read_raw_json_data(OPEN_POSITIONS_RAW_PATH)
 
     # transforming data
     columns_to_drop = ['id', 'logo_url']
@@ -253,7 +271,7 @@ if __name__ == "__main__":
     logging.info('About to start inserting the data into nba_payroll table')
 
     # extracting data
-    nba_payroll_raw_df = collect_raw_csv_data(NBA_PAYROLL_RAW_PATH)
+    nba_payroll_raw_df = read_raw_csv_data(NBA_PAYROLL_RAW_PATH)
 
     # transforming data
     columns_to_convert_to_float = ['payroll', 'inflationAdjPayroll']
@@ -293,7 +311,7 @@ if __name__ == "__main__":
         'About to start inserting the data into player_box_score_stats table')
 
     # extracting data
-    nba_player_box_raw_df = collect_raw_csv_data(NBA_PLAYER_BOX_RAW_PATH)
+    nba_player_box_raw_df = read_raw_csv_data(NBA_PLAYER_BOX_RAW_PATH)
 
     # transforming data
     column_to_convert_to_date = 'GAME_DATE'
@@ -325,7 +343,7 @@ if __name__ == "__main__":
     logging.info('About to start inserting the data into player_stats table')
 
     # extracting data
-    nba_player_stats_raw_df = collect_raw_csv_data(NBA_PLAYER_STATS_RAW_PATH)
+    nba_player_stats_raw_df = read_raw_csv_data(NBA_PLAYER_STATS_RAW_PATH)
 
     # transforming data
     nba_player_stats_transformed_df = nba_player_stats_raw_df.drop(
@@ -364,7 +382,7 @@ if __name__ == "__main__":
     logging.info('About to start inserting the data into nba_salaries table')
 
     # extracting data
-    nba_salaries_raw_df = collect_raw_csv_data(NBA_SALARIES_RAW_PATH)
+    nba_salaries_raw_df = read_raw_csv_data(NBA_SALARIES_RAW_PATH)
 
     # transforming data
     columns_to_convert_to_float = ['salary', 'inflationAdjSalary']
