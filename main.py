@@ -61,8 +61,11 @@ if __name__ == "__main__":
         'NBA Player Stats(1950 - 2022).csv', 
         'NBA Salaries(1990-2023).csv']
     for nba_dataset in nba_datasets_list:
+        print(nba_dataset)
         collect_from_kaggle(
             'loganlauton', 'nba-players-and-team-data', nba_dataset, './data')
+        
+    logging.info('Done executing Kaggle files download\n')
 
     # 1. create the schema if it does not already exist
     logging.info('About to start executing the create schema function')
