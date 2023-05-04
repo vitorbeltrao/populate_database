@@ -19,13 +19,12 @@ from components.data_collector import read_raw_csv_data
 from components.data_transform import transform_json_data
 from components.data_transform import transform_string_to_float
 from components.data_transform import transform_string_to_datetime
+from components.data_transform import create_auxiliary_columns
 
 # data_load component
 from components.data_load import create_schema_into_postgresql
 from components.data_load import create_table_into_postgresql
 from components.data_load import insert_data_into_postgresql
-from components.data_load import add_auto_increment_id_to_table
-from components.data_load import add_monitoring_columns_to_table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -94,7 +93,10 @@ if __name__ == "__main__":
     sales INT,
     designer INT,
     management INT,
-    operations INT
+    operations INT,
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     '''
     create_table_into_postgresql(
         HOST_NAME,
@@ -114,7 +116,10 @@ if __name__ == "__main__":
     team VARCHAR(30),
     season_start_year INT,
     payroll FLOAT,
-    inflation_adj_payroll FLOAT
+    inflation_adj_payroll FLOAT,
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     '''
     create_table_into_postgresql(
         HOST_NAME,
@@ -158,7 +163,10 @@ if __name__ == "__main__":
     pf FLOAT,
     pts INT,
     plus_minus FLOAT,
-    video_available INT
+    video_available INT,
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     '''
     create_table_into_postgresql(
         HOST_NAME,
@@ -205,7 +213,10 @@ if __name__ == "__main__":
     blk FLOAT,
     tov FLOAT,
     pf FLOAT,
-    pts FLOAT
+    pts FLOAT,
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     '''
     create_table_into_postgresql(
         HOST_NAME,
@@ -225,7 +236,10 @@ if __name__ == "__main__":
     player_name VARCHAR(30),
     season_start_year INT,
     salary FLOAT,
-    inflation_adj_salary FLOAT
+    inflation_adj_salary FLOAT,
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     '''
     create_table_into_postgresql(
         HOST_NAME,
@@ -254,7 +268,9 @@ if __name__ == "__main__":
     open_positions_transformed_df = open_positions_transformed_df.rename(
         columns=lambda x: x.strip().lower().replace(' ', '_'))  # standardize column names
 
-    open_positions_transformed_df.drop_duplicates(inplace=True)
+    open_positions_transformed_df.drop_duplicates(inplace=True, ignore_index=True)
+
+    create_auxiliary_columns(open_positions_transformed_df) # creating the id, created_at and updated_at columns
 
     # loading data
     insert_data_into_postgresql(
@@ -294,7 +310,9 @@ if __name__ == "__main__":
             'inflationadjpayroll': 'inflation_adj_payroll'},
         inplace=True)  # standardize column names
 
-    nba_payroll_transformed_df.drop_duplicates(inplace=True)
+    nba_payroll_transformed_df.drop_duplicates(inplace=True, ignore_index=True)
+
+    create_auxiliary_columns(nba_payroll_transformed_df) # creating the id, created_at and updated_at columns
 
     # loading data
     insert_data_into_postgresql(
@@ -326,7 +344,9 @@ if __name__ == "__main__":
     nba_player_box_transformed_df = nba_player_box_transformed_df.rename(
         columns=lambda x: x.strip().lower().replace(' ', '_'))  # standardize column names
 
-    nba_player_box_transformed_df.drop_duplicates(inplace=True)
+    nba_player_box_transformed_df.drop_duplicates(inplace=True, ignore_index=True)
+
+    create_auxiliary_columns(nba_player_box_transformed_df) # creating the id, created_at and updated_at columns
 
     # loading data
     insert_data_into_postgresql(
@@ -366,7 +386,9 @@ if __name__ == "__main__":
             'efg%': 'efg_percent',
             'ft%': 'ft_percent'}, inplace=True)  # standardize column names
 
-    nba_player_stats_transformed_df.drop_duplicates(inplace=True)
+    nba_player_stats_transformed_df.drop_duplicates(inplace=True, ignore_index=True)
+
+    create_auxiliary_columns(nba_player_stats_transformed_df) # creating the id, created_at and updated_at columns
 
     # loading data
     insert_data_into_postgresql(
@@ -406,7 +428,9 @@ if __name__ == "__main__":
             'inflationadjsalary': 'inflation_adj_salary'},
         inplace=True)  # standardize column names
 
-    nba_salaries_transformed_df.drop_duplicates(inplace=True)
+    nba_salaries_transformed_df.drop_duplicates(inplace=True, ignore_index=True)
+
+    create_auxiliary_columns(nba_salaries_transformed_df) # creating the id, created_at and updated_at columns
 
     # loading data
     insert_data_into_postgresql(
@@ -420,18 +444,18 @@ if __name__ == "__main__":
         nba_salaries_transformed_df)
     logging.info('Done executing inserting the data into nba_salaries table\n')
 
-    # 4. Create unique id's incrementally in tables already inserted in postgres
-    # 5. Create monitoring columns in tables already inserted in postgres 
-    logging.info(
-        'About to start to create unique ids and monitoring columns for the tables')
-    schema_tables = [
-        'startups_hiring.open_positions',
-        'nba.nba_payroll',
-        'nba.player_box_score_stats',
-        'nba.player_stats',
-        'nba.nba_salaries']
-    for i in schema_tables:
-        add_auto_increment_id_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
-        add_monitoring_columns_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
-    logging.info(
-        'Done executing the creation of unique ids and monitoring columns')
+    # # 4. Create unique id's incrementally in tables already inserted in postgres
+    # # 5. Create monitoring columns in tables already inserted in postgres 
+    # logging.info(
+    #     'About to start to create unique ids and monitoring columns for the tables')
+    # schema_tables = [
+    #     'startups_hiring.open_positions',
+    #     'nba.nba_payroll',
+    #     'nba.player_box_score_stats',
+    #     'nba.player_stats',
+    #     'nba.nba_salaries']
+    # for i in schema_tables:
+    #     add_auto_increment_id_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
+    #     add_monitoring_columns_to_table(HOST_NAME, DB_NAME, USER, PASSWORD, i)
+    # logging.info(
+    #     'Done executing the creation of unique ids and monitoring columns')

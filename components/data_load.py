@@ -240,84 +240,84 @@ def insert_data_into_postgresql(
     conn.close()
 
 
-def add_auto_increment_id_to_table(
-        host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
-    '''Connects to a PostgreSQL database and adds an 
-    auto-incrementing id column to a specified table
+# def add_auto_increment_id_to_table(
+#         host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
+#     '''Connects to a PostgreSQL database and adds an 
+#     auto-incrementing id column to a specified table
 
-    :param host_name: (str)
-    Is the network name for the physical machine on which the node is installed
+#     :param host_name: (str)
+#     Is the network name for the physical machine on which the node is installed
 
-    :param db_name: (str)
-    The name of the database to connect to
+#     :param db_name: (str)
+#     The name of the database to connect to
 
-    :param user_name: (str)
-    The name of the user to authenticate as
+#     :param user_name: (str)
+#     The name of the user to authenticate as
 
-    :param password: (str)
-    The user's password
+#     :param password: (str)
+#     The user's password
 
-    :param schema_table: (str)
-    The name of the schema and table in database.
-    Example: 'nba.nba_payroll'
-    '''
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=host_name,
-        database=db_name,
-        user=user_name,
-        password=password
-    )
+#     :param schema_table: (str)
+#     The name of the schema and table in database.
+#     Example: 'nba.nba_payroll'
+#     '''
+#     # Connect to the database
+#     conn = psycopg2.connect(
+#         host=host_name,
+#         database=db_name,
+#         user=user_name,
+#         password=password
+#     )
 
-    # Add a new column with an auto-incrementing id
-    cur = conn.cursor()
-    cur.execute(f'ALTER TABLE {schema_table} ADD COLUMN id SERIAL PRIMARY KEY;')
-    conn.commit()
-    logging.info(f'The ids in the {schema_table} were created: SUCCESS')
+#     # Add a new column with an auto-incrementing id
+#     cur = conn.cursor()
+#     cur.execute(f'ALTER TABLE {schema_table} ADD COLUMN id SERIAL PRIMARY KEY;')
+#     conn.commit()
+#     logging.info(f'The ids in the {schema_table} were created: SUCCESS')
 
-    # Close the database connection
-    cur.close()
-    conn.close()
+#     # Close the database connection
+#     cur.close()
+#     conn.close()
 
 
-def add_monitoring_columns_to_table(
-        host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
-    '''Connects to a PostgreSQL database and adds two
-    columns "created_at" and "updated_at" to monitore
-    the flow of data
+# def add_monitoring_columns_to_table(
+#         host_name: str, db_name: str, user_name: str, password: str, schema_table: str) -> None:
+#     '''Connects to a PostgreSQL database and adds two
+#     columns "created_at" and "updated_at" to monitore
+#     the flow of data
 
-    :param host_name: (str)
-    Is the network name for the physical machine on which the node is installed
+#     :param host_name: (str)
+#     Is the network name for the physical machine on which the node is installed
 
-    :param db_name: (str)
-    The name of the database to connect to
+#     :param db_name: (str)
+#     The name of the database to connect to
 
-    :param user_name: (str)
-    The name of the user to authenticate as
+#     :param user_name: (str)
+#     The name of the user to authenticate as
 
-    :param password: (str)
-    The user's password
+#     :param password: (str)
+#     The user's password
 
-    :param schema_table: (str)
-    The name of the schema and table in database.
-    Example: 'nba.nba_payroll'
-    '''
-    # Connect to the database
-    conn = psycopg2.connect(
-        host=host_name,
-        database=db_name,
-        user=user_name,
-        password=password
-    )
+#     :param schema_table: (str)
+#     The name of the schema and table in database.
+#     Example: 'nba.nba_payroll'
+#     '''
+#     # Connect to the database
+#     conn = psycopg2.connect(
+#         host=host_name,
+#         database=db_name,
+#         user=user_name,
+#         password=password
+#     )
 
-    # Add two new columns to monitor the data "created_at" and "updated_at"
-    cur = conn.cursor()
-    cur.execute(
-        f'''ALTER TABLE {schema_table} ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            ADD COLUMN updated_at TIMESTAMP DEFAULT now();''')
-    conn.commit()
-    logging.info(f'The monitoring columns in the {schema_table} were created: SUCCESS')
+#     # Add two new columns to monitor the data "created_at" and "updated_at"
+#     cur = conn.cursor()
+#     cur.execute(
+#         f'''ALTER TABLE {schema_table} ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+#             ADD COLUMN updated_at TIMESTAMP DEFAULT now();''')
+#     conn.commit()
+#     logging.info(f'The monitoring columns in the {schema_table} were created: SUCCESS')
 
-    # Close the database connection
-    cur.close()
-    conn.close()
+#     # Close the database connection
+#     cur.close()
+#     conn.close()
