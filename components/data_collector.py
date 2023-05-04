@@ -41,16 +41,19 @@ def collect_from_kaggle(
     logging.info('Authenticated API: SUCCESS')
 
     # Download files (datasets)
-    api.dataset_download_file(
-        f'{username}/{page_name}',
-        file_name=file_name,
-        path=path_to_save)
-    logging.info(f'Downloaded {file_name} data: SUCCESS')
-    
-    # unzip kaggle files
-    with zipfile.ZipFile(f'{path_to_save}/{file_name}.zip', 'r') as zipref:
-        zipref.extractall(path=path_to_save)
-    logging.info(f'Unzipped {file_name} file: SUCCESS')
+    try:
+        api.dataset_download_file(
+            f'{username}/{page_name}',
+            file_name=file_name,
+            path=path_to_save)
+        logging.info(f'Downloaded {file_name} data: SUCCESS')
+        
+        # unzip kaggle files
+        with zipfile.ZipFile(f'{path_to_save}/{file_name}.zip', 'r') as zipref:
+            zipref.extractall(path=path_to_save)
+        logging.info(f'Unzipped {file_name} file: SUCCESS')
+    except:
+        logging.info(f'Check if API prohibited the download of this dataset {file_name}: ERROR')
 
 
 def read_raw_csv_data(file_path: str) -> pd.DataFrame:
