@@ -24,7 +24,7 @@ The first source, referring to startups, only a .json file was obtained; The sec
 
 In the end, a database was created that has two schemas (one for each data source) and within each schema we have all the necessary tables. See the entire database hierarchy:
 
-![Populate Database architecture](https://github.com/vitorbeltrao/populate_database/blob/main/images/database_hierarchy.png?raw=true)
+![Populate Database architecture](https://github.com/vitorbeltrao/populate_database/blob/main/images/database_hierarchy.jpg?raw=true)
 ***
 
 ## Files Description <a name="files"></a>
