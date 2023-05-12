@@ -8,6 +8,7 @@ Date: May/2023
 # import necessary packages
 import pytest
 import tempfile
+import pandas as pd
 from decouple import config
 
 # config
@@ -59,3 +60,16 @@ def raw_json_data_path():
         pytest.fail('You must provide the csv file')
 
     return data_path
+
+
+@pytest.fixture(scope='session')
+def raw_json_df():
+    '''Fixture to generate raw json data path to our tests'''
+    data_path = OPEN_POSITIONS_RAW_PATH
+
+    if data_path is None:
+        pytest.fail('You must provide the csv file')
+
+    raw_json_df = pd.read_json(data_path)
+
+    return raw_json_df
