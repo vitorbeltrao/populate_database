@@ -14,6 +14,7 @@ from decouple import config
 # config
 OPEN_POSITIONS_RAW_PATH = config('OPEN_POSITIONS_RAW_PATH')
 NBA_PAYROLL_RAW_PATH = config('NBA_PAYROLL_RAW_PATH')
+NBA_PLAYER_BOX_RAW_PATH = config('NBA_PLAYER_BOX_RAW_PATH')
 
 
 @pytest.fixture
@@ -68,8 +69,34 @@ def raw_json_df():
     data_path = OPEN_POSITIONS_RAW_PATH
 
     if data_path is None:
-        pytest.fail('You must provide the csv file')
+        pytest.fail('You must provide the json file')
 
     raw_json_df = pd.read_json(data_path)
 
     return raw_json_df
+
+
+@pytest.fixture(scope='session')
+def raw_csv_df():
+    '''Fixture to generate raw csv data path to our tests'''
+    data_path = NBA_PAYROLL_RAW_PATH
+
+    if data_path is None:
+        pytest.fail('You must provide the csv file')
+
+    raw_csv_df = pd.read_csv(data_path)
+
+    return raw_csv_df
+
+
+@pytest.fixture(scope='session')
+def raw_csv_df_datetime():
+    '''Fixture to generate raw csv data path to our tests'''
+    data_path = NBA_PLAYER_BOX_RAW_PATH
+
+    if data_path is None:
+        pytest.fail('You must provide the csv file')
+
+    raw_csv_df = pd.read_csv(data_path)
+
+    return raw_csv_df
