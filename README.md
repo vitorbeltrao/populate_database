@@ -39,6 +39,13 @@ In the end, a database was created that has two schemas (one for each data sourc
     * `data_transform.py`: Python module for transforming the raw data into a format that can be loaded into the PostgreSQL database.
     * `data_load.py`: Python module for loading the transformed data into the PostgreSQL database.
 
+* `tests/`: directory that contains the tests for the functions that are in `components/`.
+
+    * `test_collector.py`: Unit tests for the functions of the respective component.
+    * `test_transform.py`: Unit tests for the functions of the respective component.
+    * `test_load.py`: Unit tests for the functions of the respective component.
+    * `conftest.py`: File where the fixtures were created to feed the unit tests.
+
 * `.env`: File containing environment variables used in the project.
 ***
 
@@ -87,6 +94,14 @@ In the .env, you must define the following variables:
 ### main.py File
 
 After all the above steps, and with docker running, you can run it in your terminal, in your main directory: `python main.py` to execute the three components in order from the *components* folder.
+
+### Testing
+
+- Run the tests:
+
+    `pytest`
+
+    The tests of the functions used are in the `populate_database/tests` folder and to run them just write the code above in the terminal. In that folder are the tests that cover the production functions that are in the `populate_database/components` folder.
 ***
 
 ## Orchestration <a name="orchestration"></a>
